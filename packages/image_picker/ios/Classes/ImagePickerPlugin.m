@@ -57,7 +57,7 @@ static const int SOURCE_GALLERY = 1;
 
   if ([@"pickImage" isEqualToString:call.method]) {
     _imagePickerController = [[UIImagePickerController alloc] init];
-    _imagePickerController.modalPresentationStyle = UIModalPresentationCurrentContext;
+    _imagePickerController.modalPresentationStyle = UIModalPresentationAutomatic;
     _imagePickerController.delegate = self;
     _imagePickerController.mediaTypes = @[ (NSString *)kUTTypeImage ];
 
@@ -81,7 +81,7 @@ static const int SOURCE_GALLERY = 1;
     }
   } else if ([@"pickVideo" isEqualToString:call.method]) {
     _imagePickerController = [[UIImagePickerController alloc] init];
-    _imagePickerController.modalPresentationStyle = UIModalPresentationCurrentContext;
+    _imagePickerController.modalPresentationStyle = UIModalPresentationAutomatic;
     _imagePickerController.delegate = self;
     _imagePickerController.mediaTypes = @[
       (NSString *)kUTTypeMovie, (NSString *)kUTTypeAVIMovie, (NSString *)kUTTypeVideo,
@@ -104,6 +104,35 @@ static const int SOURCE_GALLERY = 1;
       default:
         result([FlutterError errorWithCode:@"invalid_source"
                                    message:@"Invalid video source."
+                                   details:nil]);
+        break;
+    }
+  }else if ([@"pickMedia" isEqualToString:call.method]) {
+    _imagePickerController = [[UIImagePickerController alloc] init];
+    _imagePickerController.modalPresentationStyle = UIModalPresentationAutomatic;
+    _imagePickerController.delegate = self;
+    _imagePickerController.mediaTypes = @[ (NSString *)kUTTypeImage,  (NSString *)kUTTypeMovie, (NSString *)kUTTypeAVIMovie, (NSString *)kUTTypeVideo, (NSString *)kUTTypeMPEG4 ];
+
+    _imagePickerController.videoQuality = UIImagePickerControllerQualityTypeHigh;
+    if (@available(iOS 11.0, *)) {
+        _imagePickerController.videoExportPreset = AVAssetExportPresetPassthrough;
+    }
+
+    self.result = result;
+    _arguments = call.arguments;
+
+    int imageSource = [[_arguments objectForKey:@"source"] intValue];
+
+    switch (imageSource) {
+      case SOURCE_CAMERA:
+        [self checkCameraAuthorization];
+        break;
+      case SOURCE_GALLERY:
+        [self checkPhotoAuthorization];
+        break;
+      default:
+        result([FlutterError errorWithCode:@"invalid_source"
+                                   message:@"Invalid image source."
                                    details:nil]);
         break;
     }
