@@ -112,7 +112,7 @@ static Future<File> pickMedia(
     }
 
     final String path = await _channel.invokeMethod<String>(
-      'pickImage',
+      'pickMedia',
       <String, dynamic>{
         'source': source.index,
         'maxWidth': maxWidth,
