@@ -93,6 +93,20 @@ class ImagePicker {
     );
     return path == null ? null : File(path);
   }
+  
+  
+   static Future<File> pickMedia({
+    @required ImageSource source,
+  }) async {
+    assert(source != null);
+    final String path = await _channel.invokeMethod<String>(
+      'pickMedia',
+      <String, dynamic>{
+        'source': source.index,
+      },
+    );
+    return path == null ? null : File(path);
+  }
 
   /// Retrieve the lost image file when [pickImage] or [pickVideo] failed because the  MainActivity is destroyed. (Android only)
   ///
