@@ -20,6 +20,8 @@ public class ImagePickerPlugin implements MethodChannel.MethodCallHandler {
 
   static final String METHOD_CALL_IMAGE = "pickImage";
   static final String METHOD_CALL_VIDEO = "pickVideo";
+  static final String METHOD_CALL_MEDIA = "pickMedia";
+  
   private static final String METHOD_CALL_RETRIEVE = "retrieve";
 
   private static final String CHANNEL = "plugins.flutter.io/image_picker";
@@ -181,6 +183,19 @@ public class ImagePickerPlugin implements MethodChannel.MethodCallHandler {
             break;
           default:
             throw new IllegalArgumentException("Invalid video source: " + imageSource);
+        }
+        break;
+       case METHOD_CALL_MEDIA:
+        imageSource = call.argument("source");
+        switch (imageSource) {
+          case SOURCE_GALLERY:
+            delegate.chooseMediaFromGallery(call, result);
+            break;
+          case SOURCE_CAMERA:
+            delegate.takeMediaWithCamera(call, result);
+            break;
+          default:
+            throw new IllegalArgumentException("Invalid media source: " + imageSource);
         }
         break;
       case METHOD_CALL_RETRIEVE:
