@@ -114,10 +114,10 @@ static const int SOURCE_GALLERY = 1;
     _imagePickerController.delegate = self;
     _imagePickerController.mediaTypes = @[ (NSString *)kUTTypeImage,  (NSString *)kUTTypeMovie, (NSString *)kUTTypeAVIMovie, (NSString *)kUTTypeVideo, (NSString *)kUTTypeMPEG4 ];
 
-//     _imagePickerController.videoQuality = UIImagePickerControllerQualityTypeHigh;
-//     if (@available(iOS 11.0, *)) {
-//         _imagePickerController.videoExportPreset = AVAssetExportPresetPassthrough;
-//     }
+    _imagePickerController.videoQuality = UIImagePickerControllerQualityTypeHigh;
+    if (@available(iOS 11.0, *)) {
+        _imagePickerController.videoExportPreset = AVAssetExportPresetPassthrough;
+    }
 
     self.result = result;
     _arguments = call.arguments;
