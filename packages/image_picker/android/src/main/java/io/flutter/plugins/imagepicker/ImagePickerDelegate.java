@@ -70,10 +70,15 @@ public class ImagePickerDelegate
   @VisibleForTesting static final int REQUEST_CODE_TAKE_IMAGE_WITH_CAMERA = 2343;
   @VisibleForTesting static final int REQUEST_EXTERNAL_IMAGE_STORAGE_PERMISSION = 2344;
   @VisibleForTesting static final int REQUEST_CAMERA_IMAGE_PERMISSION = 2345;
+
   @VisibleForTesting static final int REQUEST_CODE_CHOOSE_VIDEO_FROM_GALLERY = 2352;
   @VisibleForTesting static final int REQUEST_CODE_TAKE_VIDEO_WITH_CAMERA = 2353;
   @VisibleForTesting static final int REQUEST_EXTERNAL_VIDEO_STORAGE_PERMISSION = 2354;
   @VisibleForTesting static final int REQUEST_CAMERA_VIDEO_PERMISSION = 2355;
+
+  @VisibleForTesting static final int REQUEST_CODE_CHOOSE_MEDIA_FROM_GALLERY = 2362;
+  @VisibleForTesting static final int REQUEST_CODE_MEDIA_FROM_GALLERY = 2364;
+  @VisibleForTesting static final int REQUEST_CODE_MEDIA_FROM_CAMERA = 2365;
 
   @VisibleForTesting final String fileProviderName;
 
@@ -306,10 +311,10 @@ public class ImagePickerDelegate
   }
 
   private void launchPickImageFromGalleryIntent() {
-    Intent pickImageIntent = new Intent(Intent.ACTION_GET_CONTENT);
-    pickImageIntent.setType("image/*");
+    Intent pickMediaIntent = new Intent(Intent.ACTION_GET_CONTENT);
+    pickMediaIntent.setType("image/*");
 
-    activity.startActivityForResult(pickImageIntent, REQUEST_CODE_CHOOSE_IMAGE_FROM_GALLERY);
+    activity.startActivityForResult(pickMediaIntent, REQUEST_CODE_CHOOSE_IMAGE_FROM_GALLERY);
   }
 
   public void takeImageWithCamera(MethodCall methodCall, MethodChannel.Result result) {
@@ -326,6 +331,39 @@ public class ImagePickerDelegate
     }
 
     launchTakeImageWithCameraIntent();
+  }
+
+  public void chooseMediaFromGallery(MethodCall methodCall, MethodChannel.Result result) {
+    if (!setPendingMethodCallAndResult(methodCall, result)) {
+      finishWithAlreadyActiveError(result);
+      return;
+    }
+
+    if (!permissionManager.isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+      permissionManager.askForPermission(
+              Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_CODE_MEDIA_FROM_GALLERY);
+      return;
+    }
+
+    launchPickMediaFromGalleryIntent();
+  }
+
+  private void launchPickMediaFromGalleryIntent() {
+    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+    intent.addCategory(Intent.CATEGORY_OPENABLE);
+    intent.setType("*/*");
+    String[] mimetypes = {"image/*", "video/*"};
+    intent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
+
+    activity.startActivityForResult(intent, REQUEST_CODE_CHOOSE_MEDIA_FROM_GALLERY);
+  }
+
+  public void takeMediaImageWithCamera(MethodCall methodCall, MethodChannel.Result result) {
+    takeImageWithCamera(methodCall, result);
+  }
+
+  public void takeMediaVideoWithCamera(MethodCall methodCall, MethodChannel.Result result) {
+    takeVideoWithCamera(methodCall, result);
   }
 
   private boolean needRequestCameraPermission() {
@@ -415,6 +453,16 @@ public class ImagePickerDelegate
           launchTakeVideoWithCameraIntent();
         }
         break;
+      case REQUEST_CODE_MEDIA_FROM_GALLERY:
+        if (permissionGranted) {
+          launchPickMediaFromGalleryIntent();
+        }
+        break;
+      case REQUEST_CODE_MEDIA_FROM_CAMERA:
+        if (permissionGranted) {
+          launchPickMediaFromGalleryIntent();
+        }
+        break;
       default:
         return false;
     }
@@ -423,10 +471,12 @@ public class ImagePickerDelegate
       switch (requestCode) {
         case REQUEST_EXTERNAL_IMAGE_STORAGE_PERMISSION:
         case REQUEST_EXTERNAL_VIDEO_STORAGE_PERMISSION:
+        case REQUEST_CODE_MEDIA_FROM_GALLERY:
           finishWithError("photo_access_denied", "The user did not allow photo access.");
           break;
         case REQUEST_CAMERA_IMAGE_PERMISSION:
         case REQUEST_CAMERA_VIDEO_PERMISSION:
+        case REQUEST_CODE_MEDIA_FROM_CAMERA:
           finishWithError("camera_access_denied", "The user did not allow camera access.");
           break;
       }
@@ -450,6 +500,9 @@ public class ImagePickerDelegate
       case REQUEST_CODE_TAKE_VIDEO_WITH_CAMERA:
         handleCaptureVideoResult(resultCode);
         break;
+      case REQUEST_CODE_CHOOSE_MEDIA_FROM_GALLERY:
+        handleChooseMediaResult(resultCode, data);
+        break;
       default:
         return false;
     }
@@ -472,6 +525,17 @@ public class ImagePickerDelegate
     if (resultCode == Activity.RESULT_OK && data != null) {
       String path = fileUtils.getPathFromUri(activity, data.getData());
       handleVideoResult(path);
+      return;
+    }
+
+    // User cancelled choosing a picture.
+    finishWithSuccess(null);
+  }
+
+  private void handleChooseMediaResult(int resultCode, Intent data) {
+    if (resultCode == Activity.RESULT_OK && data != null) {
+      String path = fileUtils.getPathFromUri(activity, data.getData());
+      handleMediaResult(path);
       return;
     }
 
@@ -518,7 +582,7 @@ public class ImagePickerDelegate
   }
 
   private void handleImageResult(String path, boolean shouldDeleteOriginalIfScaled) {
-    if (methodCall != null) {
+      if (methodCall != null) {
       Double maxWidth = methodCall.argument("maxWidth");
       Double maxHeight = methodCall.argument("maxHeight");
       int imageQuality =
@@ -541,6 +605,10 @@ public class ImagePickerDelegate
   }
 
   private void handleVideoResult(String path) {
+    finishWithSuccess(path);
+  }
+
+  private void handleMediaResult(String path) {
     finishWithSuccess(path);
   }
 

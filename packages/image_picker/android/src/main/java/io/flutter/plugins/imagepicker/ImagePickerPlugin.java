@@ -192,7 +192,12 @@ public class ImagePickerPlugin implements MethodChannel.MethodCallHandler {
             delegate.chooseMediaFromGallery(call, result);
             break;
           case SOURCE_CAMERA:
-            delegate.takeMediaWithCamera(call, result);
+            int type = call.argument("type");
+            if (type == 1) {
+                delegate.takeMediaImageWithCamera(call, result);
+            } else if (type == 2) {
+                delegate.takeMediaVideoWithCamera(call, result);
+            }
             break;
           default:
             throw new IllegalArgumentException("Invalid media source: " + imageSource);

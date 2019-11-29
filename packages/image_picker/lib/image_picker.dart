@@ -99,7 +99,8 @@ static Future<File> pickMedia(
       {@required ImageSource source,
       double maxWidth,
       double maxHeight,
-      int imageQuality}) async {
+      int imageQuality,
+      int type}) async {
     assert(source != null);
     assert(imageQuality == null || (imageQuality >= 0 && imageQuality <= 100));
 
@@ -117,7 +118,8 @@ static Future<File> pickMedia(
         'source': source.index,
         'maxWidth': maxWidth,
         'maxHeight': maxHeight,
-        'imageQuality': imageQuality
+        'imageQuality': imageQuality,
+        'type' : type,
       },
     );
 
