@@ -57,7 +57,13 @@ static const int SOURCE_GALLERY = 1;
 
   if ([@"pickImage" isEqualToString:call.method]) {
     _imagePickerController = [[UIImagePickerController alloc] init];
-    _imagePickerController.modalPresentationStyle = UIModalPresentationAutomatic;
+    
+    if (@available(iOS 13.0, *)) {
+       _imagePickerController.modalPresentationStyle = UIModalPresentationAutomatic;
+     }else{
+       _imagePickerController.modalPresentationStyle = UIModalPresentationFullScreen;
+     }  
+    
     _imagePickerController.delegate = self;
     _imagePickerController.mediaTypes = @[ (NSString *)kUTTypeImage ];
 
@@ -81,7 +87,13 @@ static const int SOURCE_GALLERY = 1;
     }
   } else if ([@"pickVideo" isEqualToString:call.method]) {
     _imagePickerController = [[UIImagePickerController alloc] init];
-    _imagePickerController.modalPresentationStyle = UIModalPresentationAutomatic;
+    
+    if (@available(iOS 13.0, *)) {
+       _imagePickerController.modalPresentationStyle = UIModalPresentationAutomatic;
+     }else{
+       _imagePickerController.modalPresentationStyle = UIModalPresentationFullScreen;
+     }  
+    
     _imagePickerController.delegate = self;
     _imagePickerController.mediaTypes = @[
       (NSString *)kUTTypeMovie, (NSString *)kUTTypeAVIMovie, (NSString *)kUTTypeVideo,
@@ -109,7 +121,14 @@ static const int SOURCE_GALLERY = 1;
     }
   }else if ([@"pickMedia" isEqualToString:call.method]) {
     _imagePickerController = [[UIImagePickerController alloc] init];
-    _imagePickerController.modalPresentationStyle = UIModalPresentationAutomatic;
+    
+    
+     if (@available(iOS 13.0, *)) {
+       _imagePickerController.modalPresentationStyle = UIModalPresentationAutomatic;
+     }else{
+       _imagePickerController.modalPresentationStyle = UIModalPresentationFullScreen;
+     }    
+    
     _imagePickerController.delegate = self;
     _imagePickerController.mediaTypes = @[ (NSString *)kUTTypeImage,  (NSString *)kUTTypeMovie, (NSString *)kUTTypeAVIMovie, (NSString *)kUTTypeVideo, (NSString *)kUTTypeMPEG4 ];
 
