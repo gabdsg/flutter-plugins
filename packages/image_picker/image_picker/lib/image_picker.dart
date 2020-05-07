@@ -110,15 +110,12 @@ class ImagePicker {
       throw ArgumentError.value(maxHeight, 'maxHeight cannot be negative');
     }
 
-    final String path = await _channel.invokeMethod<String>(
-      'pickMedia',
-      <String, dynamic>{
-        'source': source.index,
-        'maxWidth': maxWidth,
-        'maxHeight': maxHeight,
-        'imageQuality': imageQuality,
-        'type' : type,
-      },
+    final String path = await platform.pickMediaPath(
+      source: source,
+      maxWidth: maxWidth,
+      maxHeight: maxHeight,
+      imageQuality: imageQuality,
+      preferredCameraDevice: preferredCameraDevice,
     );
 
     return path == null ? null : File(path);

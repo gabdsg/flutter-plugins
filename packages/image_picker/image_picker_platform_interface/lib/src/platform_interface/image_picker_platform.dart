@@ -70,6 +70,17 @@ abstract class ImagePickerPlatform extends PlatformInterface {
     throw UnimplementedError('legacyPickImage() has not been implemented.');
   }
 
+
+  Future<String> pickMediaPath({
+    @required ImageSource source,
+    double maxWidth,
+    double maxHeight,
+    int imageQuality,
+    CameraDevice preferredCameraDevice = CameraDevice.rear,
+  }) {
+    throw UnimplementedError('legacyPickMedia() has not been implemented.');
+  }
+
   /// Returns a [String] containing a path to the video that was picked.
   ///
   /// The [source] argument controls where the video comes from. This can
