@@ -95,6 +95,7 @@ class ImagePicker {
 
   static Future<File> pickMedia(
       {@required ImageSource source,
+        CameraDevice preferredCameraDevice = CameraDevice.rear,
         double maxWidth,
         double maxHeight,
         int imageQuality,
