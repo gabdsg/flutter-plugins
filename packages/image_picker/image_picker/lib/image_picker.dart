@@ -93,6 +93,37 @@ class ImagePicker {
     return path == null ? null : File(path);
   }
 
+  static Future<File> pickMedia(
+      {@required ImageSource source,
+        double maxWidth,
+        double maxHeight,
+        int imageQuality,
+        int type}) async {
+    assert(source != null);
+    assert(imageQuality == null || (imageQuality >= 0 && imageQuality <= 100));
+
+    if (maxWidth != null && maxWidth < 0) {
+      throw ArgumentError.value(maxWidth, 'maxWidth cannot be negative');
+    }
+
+    if (maxHeight != null && maxHeight < 0) {
+      throw ArgumentError.value(maxHeight, 'maxHeight cannot be negative');
+    }
+
+    final String path = await _channel.invokeMethod<String>(
+      'pickMedia',
+      <String, dynamic>{
+        'source': source.index,
+        'maxWidth': maxWidth,
+        'maxHeight': maxHeight,
+        'imageQuality': imageQuality,
+        'type' : type,
+      },
+    );
+
+    return path == null ? null : File(path);
+  }
+
   /// Retrieve the lost image file when [pickImage] or [pickVideo] failed because the  MainActivity is destroyed. (Android only)
   ///
   /// Image or video can be lost if the MainActivity is destroyed. And there is no guarantee that the MainActivity is always alive.
