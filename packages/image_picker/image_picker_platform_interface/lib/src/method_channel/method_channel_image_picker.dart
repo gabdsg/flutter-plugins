@@ -102,6 +102,64 @@ class MethodChannelImagePicker extends ImagePickerPlatform {
     );
   }
 
+
+  @override
+  Future<PickedFile> pickMedia({
+    @required ImageSource source,
+    double maxWidth,
+    double maxHeight,
+    int imageQuality,
+    Duration maxDuration,
+    CameraDevice preferredCameraDevice = CameraDevice.rear,
+  }) async {
+    String path = await pickMediaPath(
+      source: source,
+      maxWidth: maxWidth,
+      maxHeight: maxHeight,
+      imageQuality: imageQuality,
+      maxDuration: maxDuration,
+      preferredCameraDevice: preferredCameraDevice,
+    );
+    return path != null ? PickedFile(path) : null;
+  }
+
+
+  @override
+  Future<String> pickMediaPath({
+    @required ImageSource source,
+    double maxWidth,
+    double maxHeight,
+    int imageQuality,
+    Duration maxDuration,
+    CameraDevice preferredCameraDevice = CameraDevice.rear,
+  }) {
+    assert(source != null);
+    if (imageQuality != null && (imageQuality < 0 || imageQuality > 100)) {
+      throw ArgumentError.value(
+          imageQuality, 'imageQuality', 'must be between 0 and 100');
+    }
+
+    if (maxWidth != null && maxWidth < 0) {
+      throw ArgumentError.value(maxWidth, 'maxWidth', 'cannot be negative');
+    }
+
+    if (maxHeight != null && maxHeight < 0) {
+      throw ArgumentError.value(maxHeight, 'maxHeight', 'cannot be negative');
+    }
+
+    return _channel.invokeMethod<String>(
+      'pickMedia',
+      <String, dynamic>{
+        'source': source.index,
+        'maxWidth': maxWidth,
+        'maxHeight': maxHeight,
+        'imageQuality': imageQuality,
+        'maxDuration': maxDuration?.inSeconds,
+        'cameraDevice': preferredCameraDevice.index
+      },
+    );
+  }
+
   @override
   Future<LostData> retrieveLostData() async {
     final Map<String, dynamic> result =

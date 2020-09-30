@@ -170,6 +170,19 @@ abstract class ImagePickerPlatform extends PlatformInterface {
     throw UnimplementedError('pickVideo() has not been implemented.');
   }
 
+
+  /// Returns a [PickedFile] with the media that was picked.
+  Future<PickedFile> pickMedia({
+    @required ImageSource source,
+    double maxWidth,
+    double maxHeight,
+    int imageQuality,
+    Duration maxDuration,
+    CameraDevice preferredCameraDevice = CameraDevice.rear,
+  }) {
+    throw UnimplementedError('pickImage() has not been implemented.');
+  }
+
   /// Retrieve the lost [PickedFile] file when [pickImage] or [pickVideo] failed because the MainActivity is destroyed. (Android only)
   ///
   /// Image or video can be lost if the MainActivity is destroyed. And there is no guarantee that the MainActivity is always alive.

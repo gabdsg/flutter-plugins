@@ -331,9 +331,35 @@ public class ImagePickerDelegate
     launchPickImageFromGalleryIntent();
   }
 
+  public void chooseMediaFromGallery(MethodCall methodCall, MethodChannel.Result result) {
+    if (!setPendingMethodCallAndResult(methodCall, result)) {
+      finishWithAlreadyActiveError(result);
+      return;
+    }
+
+    if (!permissionManager.isPermissionGranted(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+      permissionManager.askForPermission(
+              Manifest.permission.READ_EXTERNAL_STORAGE, REQUEST_EXTERNAL_IMAGE_STORAGE_PERMISSION);
+      return;
+    }
+
+    launchPickMediaFromGalleryIntent();
+  }
+
   private void launchPickImageFromGalleryIntent() {
     Intent pickImageIntent = new Intent(Intent.ACTION_GET_CONTENT);
     pickImageIntent.setType("image/*");
+
+    activity.startActivityForResult(pickImageIntent, REQUEST_CODE_CHOOSE_IMAGE_FROM_GALLERY);
+  }
+
+  private void launchPickMediaFromGalleryIntent() {
+    Intent pickImageIntent = new Intent(Intent.ACTION_GET_CONTENT);
+    pickImageIntent.setType("*/*");
+
+    String[] mimetypes = {"image/*", "video/*"};
+
+    intent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
 
     activity.startActivityForResult(pickImageIntent, REQUEST_CODE_CHOOSE_IMAGE_FROM_GALLERY);
   }
@@ -351,6 +377,25 @@ public class ImagePickerDelegate
       return;
     }
     launchTakeImageWithCameraIntent();
+  }
+
+
+  public void takeMediaithCamera(MethodCall methodCall, MethodChannel.Result result) {
+    if (!setPendingMethodCallAndResult(methodCall, result)) {
+      finishWithAlreadyActiveError(result);
+      return;
+    }
+
+    if (needRequestCameraPermission()
+            && !permissionManager.isPermissionGranted(Manifest.permission.CAMERA)) {
+      permissionManager.askForPermission(
+              Manifest.permission.CAMERA, REQUEST_CAMERA_IMAGE_PERMISSION);
+      permissionManager.askForPermission(
+              Manifest.permission.CAMERA, REQUEST_CAMERA_VIDEO_PERMISSION);
+
+      return;
+    }
+    launchTakeMediaWithCameraIntent();
   }
 
   private boolean needRequestCameraPermission() {
@@ -381,6 +426,55 @@ public class ImagePickerDelegate
     grantUriPermissions(intent, imageUri);
 
     activity.startActivityForResult(intent, REQUEST_CODE_TAKE_IMAGE_WITH_CAMERA);
+  }
+
+  private void launchTakeMediaWithCameraIntent() {
+    Intent takePictureIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+    if (this.methodCall != null && this.methodCall.argument("maxDuration") != null) {
+      int maxSeconds = this.methodCall.argument("maxDuration");
+      takePictureIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, maxSeconds);
+    }
+    if (cameraDevice == CameraDevice.FRONT) {
+      useFrontCamera(takePictureIntent);
+    }
+
+    boolean canTakePhotos = intentResolver.resolveActivity(takePictureIntent);
+
+    if (!canTakePhotos) {
+      finishWithError("no_available_camera", "No cameras available for taking pictures.");
+      return;
+    }
+
+    File videoFile = createTemporaryWritableVideoFile();
+    pendingCameraMediaUri = Uri.parse("file:" + videoFile.getAbsolutePath());
+
+    Uri videoUri = fileUriResolver.resolveFileProviderUriForFile(fileProviderName, videoFile);
+    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
+    grantUriPermissions(takePictureIntent, videoUri);
+
+    Intent takeVideoIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+    if (cameraDevice == CameraDevice.FRONT) {
+      useFrontCamera(takeVideoIntent);
+    }
+
+    boolean canTakePhotos = intentResolver.resolveActivity(takeVideoIntent);
+
+    if (!canTakePhotos) {
+      finishWithError("no_available_camera", "No cameras available for taking pictures.");
+      return;
+    }
+
+    File imageFile = createTemporaryWritableImageFile();
+    pendingCameraMediaUri = Uri.parse("file:" + imageFile.getAbsolutePath());
+
+    Uri imageUri = fileUriResolver.resolveFileProviderUriForFile(fileProviderName, imageFile);
+    takeVideoIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+    grantUriPermissions(takeVideoIntent, imageUri);
+
+
+    Intent chooserIntent = Intent.createChooser(takePictureIntent, "Capture image or video");
+    chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takeVideoIntent});
+    activity.startActivityForResult(chooserIntent, CAPTURE_MEDIA_RESULT_CODE);
   }
 
   private File createTemporaryWritableImageFile() {

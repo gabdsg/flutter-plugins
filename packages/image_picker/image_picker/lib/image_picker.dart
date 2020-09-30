@@ -167,6 +167,28 @@ class ImagePicker {
     );
   }
 
+
+  /// Returns a [PickedFile] object wrapping the media that was picked.
+  Future<PickedFile> getMedia({
+    @required ImageSource source,
+    CameraDevice preferredCameraDevice = CameraDevice.rear,
+    double maxWidth,
+    double maxHeight,
+    int imageQuality,
+    Duration maxDuration,
+  }) {
+    return platform.pickMedia(
+      source: source,
+      preferredCameraDevice: preferredCameraDevice,
+      maxWidth: maxWidth,
+      maxHeight: maxHeight,
+      imageQuality: imageQuality,
+      maxDuration: maxDuration,
+    );
+  }
+
+
+
   /// Retrieve the lost image file when [pickImage] or [pickVideo] failed because the  MainActivity is destroyed. (Android only)
   ///
   /// Image or video can be lost if the MainActivity is destroyed. And there is no guarantee that the MainActivity is always alive.
