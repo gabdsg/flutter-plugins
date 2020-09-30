@@ -467,7 +467,7 @@ public class ImagePickerDelegate
 
     Intent chooserIntent = Intent.createChooser(takePictureIntent, "Capture image or video");
     chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{takeVideoIntent});
-    activity.startActivityForResult(chooserIntent, CAPTURE_MEDIA_RESULT_CODE);
+    activity.startActivityForResult(chooserIntent, 1);
   }
 
   private File createTemporaryWritableImageFile() {
