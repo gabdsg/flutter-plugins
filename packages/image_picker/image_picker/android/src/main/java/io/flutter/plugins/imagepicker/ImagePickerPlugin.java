@@ -93,8 +93,6 @@ public class ImagePickerPlugin
 
   static final String METHOD_CALL_IMAGE = "pickImage";
   static final String METHOD_CALL_VIDEO = "pickVideo";
-  static final String METHOD_CALL_MEDIA = "pickMedia";
-  
   private static final String METHOD_CALL_RETRIEVE = "retrieve";
   private static final int CAMERA_DEVICE_FRONT = 1;
   private static final int CAMERA_DEVICE_REAR = 0;
@@ -113,7 +111,8 @@ public class ImagePickerPlugin
   private Lifecycle lifecycle;
   private LifeCycleObserver observer;
 
-  public static void registerWith(PluginRegistry.Registrar registrar) {
+  @SuppressWarnings("deprecation")
+  public static void registerWith(io.flutter.plugin.common.PluginRegistry.Registrar registrar) {
     if (registrar.activity() == null) {
       // If a background flutter view tries to register the plugin, there will be no activity from the registrar,
       // we stop the registering process immediately because the ImagePicker requires an activity.
@@ -315,24 +314,6 @@ public class ImagePickerPlugin
             break;
           default:
             throw new IllegalArgumentException("Invalid video source: " + imageSource);
-        }
-        break;
-       case METHOD_CALL_MEDIA:
-        imageSource = call.argument("source");
-        switch (imageSource) {
-          case SOURCE_GALLERY:
-            delegate.chooseMediaFromGallery(call, result);
-            break;
-          case SOURCE_CAMERA:
-            int type = call.argument("type");
-            if (type == 1) {
-                delegate.takeMediaImageWithCamera(call, result);
-            } else if (type == 2) {
-                delegate.takeMediaVideoWithCamera(call, result);
-            }
-            break;
-          default:
-            throw new IllegalArgumentException("Invalid media source: " + imageSource);
         }
         break;
       case METHOD_CALL_RETRIEVE:

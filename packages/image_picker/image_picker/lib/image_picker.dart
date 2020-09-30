@@ -81,13 +81,15 @@ class ImagePicker {
   /// original width and height.
   /// The `imageQuality` argument modifies the quality of the image, ranging from 0-100
   /// where 100 is the original/max quality. If `imageQuality` is null, the image with
-  /// the original quality will be returned. Compression is only supportted for certain
-  /// image types such as JPEG. If compression is not supported for the image that is picked,
-  /// an warning message will be logged.
+  /// the original quality will be returned. Compression is only supported for certain
+  /// image types such as JPEG and on Android PNG and WebP, too. If compression is not supported for the image that is picked,
+  /// a warning message will be logged.
   ///
   /// Use `preferredCameraDevice` to specify the camera to use when the `source` is [ImageSource.camera].
   /// The `preferredCameraDevice` is ignored when `source` is [ImageSource.gallery]. It is also ignored if the chosen camera is not supported on the device.
-  /// Defaults to [CameraDevice.rear].
+  /// Defaults to [CameraDevice.rear]. Note that Android has no documented parameter for an intent to specify if
+  /// the front or rear camera should be opened, this function is not guaranteed
+  /// to work on an Android device.
   ///
   /// In Android, the MainActivity can be destroyed for various reasons. If that happens, the result will be lost
   /// in this call. You can then call [getLostData] when your app relaunches to retrieve the lost data.
@@ -132,35 +134,6 @@ class ImagePicker {
       source: source,
       preferredCameraDevice: preferredCameraDevice,
       maxDuration: maxDuration,
-    );
-
-    return path == null ? null : File(path);
-  }
-
-  static Future<File> pickMedia(
-      {@required ImageSource source,
-        CameraDevice preferredCameraDevice = CameraDevice.rear,
-        double maxWidth,
-        double maxHeight,
-        int imageQuality,
-        int type}) async {
-    assert(source != null);
-    assert(imageQuality == null || (imageQuality >= 0 && imageQuality <= 100));
-
-    if (maxWidth != null && maxWidth < 0) {
-      throw ArgumentError.value(maxWidth, 'maxWidth cannot be negative');
-    }
-
-    if (maxHeight != null && maxHeight < 0) {
-      throw ArgumentError.value(maxHeight, 'maxHeight cannot be negative');
-    }
-
-    final String path = await platform.pickMediaPath(
-      source: source,
-      maxWidth: maxWidth,
-      maxHeight: maxHeight,
-      imageQuality: imageQuality,
-      preferredCameraDevice: preferredCameraDevice,
     );
 
     return path == null ? null : File(path);

@@ -50,9 +50,9 @@ abstract class ImagePickerPlatform extends PlatformInterface {
   ///
   /// The `imageQuality` argument modifies the quality of the image, ranging from 0-100
   /// where 100 is the original/max quality. If `imageQuality` is null, the image with
-  /// the original quality will be returned. Compression is only supportted for certain
-  /// image types such as JPEG. If compression is not supported for the image that is picked,
-  /// an warning message will be logged.
+  /// the original quality will be returned. Compression is only supported for certain
+  /// image types such as JPEG and on Android PNG and WebP, too. If compression is not supported for the image that is picked,
+  /// a warning message will be logged.
   ///
   /// Use `preferredCameraDevice` to specify the camera to use when the `source` is [ImageSource.camera].
   /// The `preferredCameraDevice` is ignored when `source` is [ImageSource.gallery]. It is also ignored if the chosen camera is not supported on the device.
@@ -70,7 +70,6 @@ abstract class ImagePickerPlatform extends PlatformInterface {
   }) {
     throw UnimplementedError('legacyPickImage() has not been implemented.');
   }
-
 
   /// Returns a [String] containing a path to the video that was picked.
   ///
@@ -95,19 +94,7 @@ abstract class ImagePickerPlatform extends PlatformInterface {
     throw UnimplementedError('pickVideoPath() has not been implemented.');
   }
 
-
-
-  Future<String> pickMediaPath({
-    @required ImageSource source,
-    double maxWidth,
-    double maxHeight,
-    int imageQuality,
-    CameraDevice preferredCameraDevice = CameraDevice.rear,
-  }) {
-    throw UnimplementedError('legacyPickMedia() has not been implemented.');
-  }
-
-  /// Retrieve the lost image file when [pickImage] or [pickVideo] failed because the  MainActivity is destroyed. (Android only)
+  /// Retrieve the lost image file when [pickImagePath] or [pickVideoPath] failed because the  MainActivity is destroyed. (Android only)
   ///
   /// Image or video can be lost if the MainActivity is destroyed. And there is no guarantee that the MainActivity is always alive.
   /// Call this method to retrieve the lost data and process the data according to your APP's business logic.
@@ -145,7 +132,9 @@ abstract class ImagePickerPlatform extends PlatformInterface {
   ///
   /// Use `preferredCameraDevice` to specify the camera to use when the `source` is [ImageSource.camera].
   /// The `preferredCameraDevice` is ignored when `source` is [ImageSource.gallery]. It is also ignored if the chosen camera is not supported on the device.
-  /// Defaults to [CameraDevice.rear].
+  /// Defaults to [CameraDevice.rear]. Note that Android has no documented parameter for an intent to specify if
+  /// the front or rear camera should be opened, this function is not guaranteed
+  /// to work on an Android device.
   ///
   /// In Android, the MainActivity can be destroyed for various reasons. If that happens, the result will be lost
   /// in this call. You can then call [retrieveLostData] when your app relaunches to retrieve the lost data.
