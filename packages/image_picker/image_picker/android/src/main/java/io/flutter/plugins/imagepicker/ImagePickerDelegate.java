@@ -457,13 +457,6 @@ public class ImagePickerDelegate
       useFrontCamera(takeVideoIntent);
     }
 
-    boolean canTakePhotos = intentResolver.resolveActivity(takeVideoIntent);
-
-    if (!canTakePhotos) {
-      finishWithError("no_available_camera", "No cameras available for taking pictures.");
-      return;
-    }
-
     File imageFile = createTemporaryWritableImageFile();
     pendingCameraMediaUri = Uri.parse("file:" + imageFile.getAbsolutePath());
 
