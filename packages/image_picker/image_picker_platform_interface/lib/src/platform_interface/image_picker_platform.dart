@@ -180,7 +180,7 @@ abstract class ImagePickerPlatform extends PlatformInterface {
     Duration maxDuration,
     CameraDevice preferredCameraDevice = CameraDevice.rear,
   }) {
-    throw UnimplementedError('pickImage() has not been implemented.');
+    throw UnimplementedError('pickMedia() has not been implemented.');
   }
 
   /// Retrieve the lost [PickedFile] file when [pickImage] or [pickVideo] failed because the MainActivity is destroyed. (Android only)
