@@ -380,7 +380,7 @@ public class ImagePickerDelegate
   }
 
 
-  public void takeMediaithCamera(MethodCall methodCall, MethodChannel.Result result) {
+  public void takeMediaWithCamera(MethodCall methodCall, MethodChannel.Result result) {
     if (!setPendingMethodCallAndResult(methodCall, result)) {
       finishWithAlreadyActiveError(result);
       return;
