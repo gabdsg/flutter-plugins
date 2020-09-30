@@ -359,7 +359,7 @@ public class ImagePickerDelegate
 
     String[] mimetypes = {"image/*", "video/*"};
 
-    intent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
+    pickImageIntent.putExtra(Intent.EXTRA_MIME_TYPES, mimetypes);
 
     activity.startActivityForResult(pickImageIntent, REQUEST_CODE_CHOOSE_IMAGE_FROM_GALLERY);
   }
